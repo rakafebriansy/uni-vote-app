@@ -1,0 +1,8 @@
+{
+    "_id": "[ObjectId()]",
+    "electionId": "[ObjectId()]",
+    "voterNim": "222410101086",
+    "candidateNim": "222410101050",
+    "votedAt": "[ISODate()]"
+  }
+  

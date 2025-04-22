@@ -1,0 +1,19 @@
+{
+    "_id": "[ObjectID()]",
+    "title": "Pemilihan Ketua Bem 2025",
+    "candidates": [
+        {
+            "nim": "222410101050",
+            "name": "Raka Febrian",
+            "votes": 60
+        },
+        {
+            "nim": "222410101097",
+            "name": "Cirilla Fiona",
+            "votes": 160
+        }
+    ],
+    "expiresAt": "[ISODate()]",
+    "status": "open",
+    "createdAt": "[ISODate()]"
+}

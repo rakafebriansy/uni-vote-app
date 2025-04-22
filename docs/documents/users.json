@@ -1,0 +1,8 @@
+{
+    "_id": "[ObjectID()]",
+    "nim": "222410101050",
+    "name": "Raka Febrian",
+    "role": "student",
+    "password": "[Hashed Password]",
+    "createdAt": "[ISODate()]"
+}
