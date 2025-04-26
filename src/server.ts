@@ -4,9 +4,12 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { connectDB } from './db';
 import { setupWebSocket } from './socket';
 import routes from './routes'
+import dotenv from 'dotenv';
 
 const app = express();
 const server: HTTPServer = createServer(app);
+
+dotenv.config();
 
 setupWebSocket(server);
 

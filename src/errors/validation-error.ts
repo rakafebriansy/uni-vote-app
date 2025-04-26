@@ -8,7 +8,6 @@ export default class ValidationError extends Error {
     }
 
     static fromZod(error: any) {
-        console.log(error);
         if (error instanceof z.ZodError) {
             const errors = error.issues.map((issue) => ({
                 field: issue.path.join('.'),
