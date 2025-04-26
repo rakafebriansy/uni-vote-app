@@ -3,16 +3,16 @@ import { createServer, Server as HTTPServer } from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
 import { connectDB } from './db';
 import { setupWebSocket } from './socket';
+import routes from './routes'
 
 const app = express();
 const server: HTTPServer = createServer(app);
 
-//setting up web socket
 setupWebSocket(server);
 
-app.get('/', (req: Request, res: Response): void => {
-  res.send('Voting App is running!');
-});
+app.use(express.json());
+
+app.use('/api', routes);
 
 const PORT: number = parseInt(process.env.PORT || '3000', 10);
 

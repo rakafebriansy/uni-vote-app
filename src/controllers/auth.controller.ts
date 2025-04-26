@@ -1,21 +1,32 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { User } from '../models/user.model';
+import { IUserDoc, User } from '../models/user.model';
+import { registerSchema } from '../validations/auth.validation';
+import { IUserRequest } from '../requests/user.request';
+import { z, ZodError } from 'zod';
+import ValidationError from '../errors/validation-error';
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { nim, name, role, password } = req.body;
+    const { nim, name, password, role } = req.body;
 
-    const existing = await User.findOne({ nim });
-    if (existing) {
-      return res.status(400).json({ message: 'NIM already exists' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({
+    const data: IUserRequest = registerSchema.parse({
       nim,
       name,
-      role,
+      password,
+      role: role ?? 'student'
+    } as IUserRequest);
+
+    const existing: IUserDoc | null = await User.findOne({ nim });
+    if (existing) {
+      throw new ValidationError('NIM is already exists');
+    }
+
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const user = new User({
+      nim: data.nim,
+      name: data.name,
+      role: data.role,
       password: hashedPassword,
     });
 
@@ -23,6 +34,13 @@ export const register = async (req: Request, res: Response) => {
     return res.status(201).json({ message: 'User registered successfully' });
 
   } catch (err) {
-    return res.status(500).json({ message: 'Error registering user', error: err });
+    if(err instanceof ZodError) {
+      const validationError = ValidationError.fromZod(err);
+      return res.status(400).json(validationError.getMessage());
+    }
+    if(err instanceof ValidationError) {
+      return res.status(400).json(err.getMessage());
+    }
+    return res.status(500).json({ message: 'Unhandled error: ', error: err });
   }
 };
