@@ -1,4 +1,5 @@
 import { z } from "zod";
+import FormatHelper from "../helpers/format.helper";
 
 export default class ValidationError extends Error {
     constructor(message: string) {
@@ -6,10 +7,15 @@ export default class ValidationError extends Error {
         this.name = "Validation Error";
     }
 
-    static fromZod(error: Error) {
+    static fromZod(error: any) {
+        console.log(error);
         if (error instanceof z.ZodError) {
-            const messages: string[] = error.errors.map(err => err.message);
-            return new ValidationError(messages[0]);
+            const errors = error.issues.map((issue) => ({
+                field: issue.path.join('.'),
+                message: issue.message,
+            }));
+            const message = errors[0].message == 'Required' ? `${FormatHelper.capitalize(errors[0].field)} field can't be null` : errors[0].message
+            return new ValidationError(message);
         }
         return new ValidationError(error.message ?? 'Internal server Error');
     }

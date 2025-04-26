@@ -9,3 +9,8 @@ export const registerSchema = z.object({
   password: z.string().min(6, VEMH.setErrorMessage(Type.MINCHAR, 'Password', 6),),
   role: z.nativeEnum(RoleType),
 });
+
+export const loginSchema = z.object({
+  nim: z.string(),
+  password: z.string(),
+});

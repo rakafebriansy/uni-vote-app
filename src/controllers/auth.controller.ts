@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { IUserDoc, User } from '../models/user.model';
 import { registerSchema } from '../validations/auth.validation';
-import { IUserRequest } from '../requests/user.request';
+import { IUserLoginRequest, IUserRegisterRequest } from '../requests/user.request';
 import { z, ZodError } from 'zod';
 import ValidationError from '../errors/validation-error';
 
@@ -10,12 +10,12 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { nim, name, password, role } = req.body;
 
-    const data: IUserRequest = registerSchema.parse({
+    const data: IUserRegisterRequest = registerSchema.parse({
       nim,
       name,
       password,
       role: role ?? 'student'
-    } as IUserRequest);
+    } as IUserRegisterRequest);
 
     const existing: IUserDoc | null = await User.findOne({ nim });
     if (existing) {
