@@ -11,8 +11,6 @@ const authenticate = (req: AuthenticatedRequest, res: Response, next: NextFuncti
       throw new AuthenticationError('No token provided');
     }
 
-    console.log(token)
-
     const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as JwtPayload;
     req.user = decoded;
     next();
