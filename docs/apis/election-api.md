@@ -180,3 +180,39 @@ Response Body (Failed):
     "errors": "Failed to create an election"
 }
 ```
+
+## Get Vote
+
+Endpoint: GET /api/elections/:id/vote
+
+Headers:
+- Authorization: any.token
+
+Response Body (Success):
+```json
+{
+    "message": "Get Vote",
+    "data": {
+        "_id": "[ObjectID()]",
+        "votes": [
+            {
+                "_id": "[ObjectID()]",
+                "nim": "222410101050",
+                "count": 60
+            },
+            {
+                "_id": "[ObjectID()]",
+                "nim": "222410101097",
+                "count": 24
+            },
+        ],
+    }
+}
+```
+
+Response Body (Failed):
+```json
+{
+    "errors": "Election is not found"
+}
+```
