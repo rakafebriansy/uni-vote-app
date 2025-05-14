@@ -30,7 +30,7 @@ export const register = async (req: Request, res: Response) => {
       name: data.name,
       role: data.role,
       password: hashedPassword,
-    });
+    } as IUserDoc);
 
     const payload: IUserResource = {
       id: String(user._id),
@@ -63,12 +63,13 @@ export const login = async (req: Request, res: Response) => {
       password,
     } as IUserLoginRequest);
 
-    const user = await User.findOne({ nim: data.nim });
+    const user: IUserDoc | null = await User.findOne({ nim: data.nim });
 
     if (!user) {
       throw new ValidationError('Invalid credentials');
     }
-
+    
+    
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       throw new ValidationError('Invalid credentials');

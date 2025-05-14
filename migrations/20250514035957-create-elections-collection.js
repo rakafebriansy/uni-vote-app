@@ -10,22 +10,6 @@ module.exports = {
     // Example:
     // await db.collection('albums').updateOne({artist: 'The Beatles'}, {$set: {blacklisted: true}});
     await db.createCollection('users');
-
-    await db.collection('elections').insertOne(
-      {
-        title: "Pemilihan Ketua BEM 2025",
-        candidates: [
-          {
-            name: "Raka Febrian",
-            nim: "222410101050"
-          },
-          {
-            name: "Cirilla Fiona",
-            nim: "222410101097"
-          }
-        ],
-        expiresAt: "2025-04-25T23:59:00Z"
-      });
   },
 
   /**

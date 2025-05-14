@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { createServer, Server as HTTPServer } from 'http';
 import { connectDB } from './db';
 import { setupWebSocket } from './socket';

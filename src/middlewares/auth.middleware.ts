@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import jwt, { JsonWebTokenError, JwtPayload, TokenExpiredError } from 'jsonwebtoken';
+import jwt, { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import AuthenticationError from '../errors/authentication-error';
 import { AuthenticatedRequest } from '../requests/auth.request';
+import { UserJwtPayload } from '../types';
 
 const authenticate = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
   try {
@@ -11,8 +12,9 @@ const authenticate = (req: AuthenticatedRequest, res: Response, next: NextFuncti
       throw new AuthenticationError('No token provided');
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as JwtPayload;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY as string) as UserJwtPayload;
     req.user = decoded;
+
     next();
   } catch (err) {
     if (err instanceof TokenExpiredError || JsonWebTokenError) {
