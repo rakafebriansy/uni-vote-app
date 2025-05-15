@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { ValidationErrorEnum as Type } from '../enums/validation.enum';
 import VEMH from '../helpers/validation.helper';
-import { RoleEnum } from '../enums/user.enum';
 
 const candidateSchema = z.object({
     name: z.string().min(1, VEMH.setErrorMessage(Type.REQUIRED, 'Name')),

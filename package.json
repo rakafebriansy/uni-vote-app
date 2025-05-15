@@ -7,7 +7,8 @@
     "start": "node dist/server.js",
     "dev": "nodemon src/server.ts",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "seed:elections": "ts-node seeders/elections.seeder.ts"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
     "zod": "^3.24.3"
   },
   "devDependencies": {
+    "@faker-js/faker": "^9.8.0",
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.1",
     "@types/jest": "^29.5.14",

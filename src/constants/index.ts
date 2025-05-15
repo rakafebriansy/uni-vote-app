@@ -1,0 +1,2 @@
+export const ELECTION_PAGE_DEFAULT = 1;
+export const ELECTION_PER_PAGE_DEFAULT = 1;

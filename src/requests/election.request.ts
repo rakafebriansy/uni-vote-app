@@ -1,3 +1,5 @@
+import { Candidate } from "../types";
+
 export interface IElectionCreateRequest {
     title: string,
     candidates: Candidate[],
