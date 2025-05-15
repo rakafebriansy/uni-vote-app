@@ -6,7 +6,6 @@ import { electionSchema } from '../validations/election.validation';
 import { Election, IElectionDoc } from '../models/election.model';
 import { IElectionResource } from '../resources/election.resource';
 import { AuthenticatedRequest } from '../requests/auth.request';
-import { serializeElection, serializeElectionList } from '../serializers/election.serializer';
 import { ELECTION_PAGE_DEFAULT, ELECTION_PER_PAGE_DEFAULT } from '../constants';
 
 export const create = async (req: AuthenticatedRequest, res: Response) => {
@@ -30,7 +29,7 @@ export const create = async (req: AuthenticatedRequest, res: Response) => {
       expiresAt: new Date(data.expiresAt),
     } as IElectionDoc);
 
-    const payload: IElectionResource = serializeElection(election);
+    const payload: IElectionResource = IElectionResource.serializeElection(election);
 
     await election.save();
     return res.status(201).json({ message: 'Election created successfully', data: payload });
@@ -66,7 +65,7 @@ export const search = async (req: AuthenticatedRequest, res: Response) => {
 
     const total = await Election.countDocuments(query);
 
-    const payload: IElectionResource[] = serializeElectionList(elections);
+    const payload: IElectionResource[] = IElectionResource.serializeElectionList(elections);
 
     return res.status(200).json({
       message: 'Search election result',
