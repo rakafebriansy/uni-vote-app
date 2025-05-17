@@ -123,3 +123,33 @@ export const get = async (req: AuthenticatedRequest, res: Response) => {
     return res.status(500).json({ message: 'Unhandled error: ', error: err });
   }
 };
+
+export const remove = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      throw new ValidationError('Invalid id');
+    }
+
+    const result = await Election.deleteOne({ _id: userId });
+
+    if (result.deletedCount === 0) {
+      throw new NotFoundError('Election is not found');
+    }
+
+    return res.status(200).json({
+      message: 'Election deleted successfully',
+      data: true,
+    });
+
+  } catch (err) {
+    if (err instanceof NotFoundError) {
+      return res.status(404).json(err.getMessage());
+    }
+    if (err instanceof ValidationError) {
+      return res.status(400).json(err.getMessage());
+    }
+    return res.status(500).json({ message: 'Unhandled error: ', error: err });
+  }
+};
