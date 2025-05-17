@@ -95,7 +95,6 @@ Endpoint: GET /api/elections/:id
 Headers:
 - Authorization: any.token
 
-
 Response Body (Success):
 ```json
 {

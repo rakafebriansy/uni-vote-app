@@ -7,6 +7,8 @@ import { Election, IElectionDoc } from '../models/election.model';
 import { IElectionResource } from '../resources/election.resource';
 import { AuthenticatedRequest } from '../requests/auth.request';
 import { ELECTION_PAGE_DEFAULT, ELECTION_PER_PAGE_DEFAULT } from '../constants';
+import NotFoundError from '../errors/not-found-error';
+import mongoose from 'mongoose';
 
 export const create = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -82,6 +84,38 @@ export const search = async (req: AuthenticatedRequest, res: Response) => {
     if (err instanceof ZodError) {
       const validationError = ValidationError.fromZod(err);
       return res.status(400).json(validationError.getMessage());
+    }
+    if (err instanceof ValidationError) {
+      return res.status(400).json(err.getMessage());
+    }
+    return res.status(500).json({ message: 'Unhandled error: ', error: err });
+  }
+};
+
+export const get = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      throw new ValidationError('Invalid id');
+    }
+
+    const election: IElectionDoc | null = await Election.findById(userId);
+
+    if (election == null) {
+      throw new NotFoundError('Election is not found');
+    }
+
+    const payload: IElectionResource = IElectionResource.serializeElection(election);
+
+    return res.status(200).json({
+      message: 'Get election result',
+      data: payload,
+    });
+
+  } catch (err) {
+    if (err instanceof NotFoundError) {
+      return res.status(404).json(err.getMessage());
     }
     if (err instanceof ValidationError) {
       return res.status(400).json(err.getMessage());
