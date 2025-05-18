@@ -145,7 +145,7 @@ Response: Body (Failed):
 }
 ```
 
-## Create Vote
+## Attempt Vote
 
 Endpoint: POST /api/elections/:id/vote
 
@@ -176,13 +176,13 @@ Response Body (Success):
 Response Body (Failed):
 ```json
 {
-    "errors": "Failed to create an election"
+    "errors": "Failed to attempt vote"
 }
 ```
 
-## Get Vote
+## Get Summary of Election
 
-Endpoint: GET /api/elections/:id/vote
+Endpoint: GET /api/elections/:id/sum-of-election
 
 Headers:
 - Authorization: any.token

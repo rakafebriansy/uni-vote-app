@@ -1,8 +1,8 @@
 import { Response } from 'express';
 import { ZodError } from 'zod';
 import ValidationError from '../errors/validation-error';
-import { IElectionCreateRequest } from '../requests/election.request';
-import { electionSchema } from '../validations/election.validation';
+import { IElectionCreateRequest, IVoteCreateRequest } from '../requests/election.request';
+import { electionSchema, voteSchema } from '../validations/election.validation';
 import { Election, IElectionDoc } from '../models/election.model';
 import { IElectionResource } from '../resources/election.resource';
 import { AuthenticatedRequest } from '../requests/auth.request';
@@ -14,16 +14,16 @@ export const create = async (req: AuthenticatedRequest, res: Response) => {
   try {
     const { title, candidates, expiresAt } = req.body;
 
+    const existing: IElectionDoc | null = await Election.findOne({ title });
+    if (existing) {
+      throw new ValidationError('Election is already exists');
+    }
+
     const data: IElectionCreateRequest = electionSchema.parse({
       title,
       candidates,
       expiresAt
     } as IElectionCreateRequest);
-
-    const existing: IElectionDoc | null = await Election.findOne({ title });
-    if (existing) {
-      throw new ValidationError('Election is already exists');
-    }
 
     const election = new Election({
       title: data.title,
@@ -94,13 +94,13 @@ export const search = async (req: AuthenticatedRequest, res: Response) => {
 
 export const get = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const userId = req.params.id;
+    const electionId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       throw new ValidationError('Invalid id');
     }
 
-    const election: IElectionDoc | null = await Election.findById(userId);
+    const election: IElectionDoc | null = await Election.findById(electionId);
 
     if (election == null) {
       throw new NotFoundError('Election is not found');
@@ -146,6 +146,52 @@ export const remove = async (req: AuthenticatedRequest, res: Response) => {
   } catch (err) {
     if (err instanceof NotFoundError) {
       return res.status(404).json(err.getMessage());
+    }
+    if (err instanceof ValidationError) {
+      return res.status(400).json(err.getMessage());
+    }
+    return res.status(500).json({ message: 'Unhandled error: ', error: err });
+  }
+};
+
+export const vote = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { nim, candidateNim } = req.body || {};
+    const electionId = req.params.id;
+
+    const election = await Election.findOne({
+      _id: electionId,
+      votes: {
+        $elemMatch: { nim, candidateNim }
+      }
+    });
+
+    if (election) {
+      throw new ValidationError('Vote is already exists');
+    }
+
+    const data: IVoteCreateRequest = voteSchema.parse({
+      nim,
+      candidateNim,
+    } as IVoteCreateRequest);
+
+    const vote = {
+      _id: new mongoose.Types.ObjectId(),
+      nim: data.nim,
+      candidateNim: data.candidateNim
+    };
+
+    await Election.updateOne(
+      { _id: electionId },
+      { $push: { votes: vote } }
+    );
+
+    return res.status(201).json({ message: 'Vote created successfully', data: vote });
+
+  } catch (err) {
+    if (err instanceof ZodError) {
+      const validationError = ValidationError.fromZod(err);
+      return res.status(400).json(validationError.getMessage());
     }
     if (err instanceof ValidationError) {
       return res.status(400).json(err.getMessage());

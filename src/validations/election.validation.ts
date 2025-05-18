@@ -14,3 +14,8 @@ export const electionSchema = z.object({
         message: VEMH.setErrorMessage(Type.REQUIRED, 'Expires at'),
     }),
 });
+
+export const voteSchema = z.object({
+    nim: z.string().min(1, VEMH.setErrorMessage(Type.REQUIRED, 'NIM')),
+    candidateNim: z.string().min(1, VEMH.setErrorMessage(Type.REQUIRED, 'Candidate NIM')),
+});

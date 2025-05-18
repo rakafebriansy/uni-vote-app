@@ -5,3 +5,8 @@ export interface IElectionCreateRequest {
     candidates: Candidate[],
     expiresAt: string
 }
+
+export interface IVoteCreateRequest {
+    nim: string,
+    candidateNim: string
+}
