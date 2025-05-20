@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { ValidationErrorEnum as Type } from '../enums/validation.enum';
+import { ValidationErrorEnum as Type } from '../constants';
 import VEMH from '../helpers/validation.helper';
 
 const candidateSchema = z.object({

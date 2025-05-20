@@ -1,7 +1,6 @@
 import { z } from 'zod';
-import { ValidationErrorEnum as Type } from '../enums/validation.enum';
+import { ValidationErrorEnum as Type, RoleEnum } from '../constants';
 import VEMH from '../helpers/validation.helper';
-import { RoleEnum } from '../enums/user.enum';
 
 export const registerSchema = z.object({
   nim: z.string().length(12, VEMH.setErrorMessage(Type.LENGTHCHAR, 'NIM', 12)),
