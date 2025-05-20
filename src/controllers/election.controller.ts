@@ -9,6 +9,7 @@ import { AuthenticatedRequest } from '../requests/auth.request';
 import { ELECTION_PAGE_DEFAULT, ELECTION_PER_PAGE_DEFAULT } from '../constants';
 import NotFoundError from '../errors/not-found-error';
 import mongoose from 'mongoose';
+import { UserJwtPayload } from '../types';
 
 export const create = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -102,7 +103,7 @@ export const get = async (req: AuthenticatedRequest, res: Response) => {
 
     const election: IElectionDoc | null = await Election.findById(electionId);
 
-    if (election == null) {
+    if (!election) {
       throw new NotFoundError('Election is not found');
     }
 
@@ -156,35 +157,51 @@ export const remove = async (req: AuthenticatedRequest, res: Response) => {
 
 export const vote = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { nim, candidateNim } = req.body || {};
+    const { candidateNim } = req.body || {};
     const electionId = req.params.id;
+    const user: UserJwtPayload = req.user as UserJwtPayload;
 
-    const election = await Election.findOne({
-      _id: electionId,
-      votes: {
-        $elemMatch: { nim, candidateNim }
-      }
-    });
+    const election: IElectionDoc | null = await Election.findById(electionId);
 
-    if (election) {
-      throw new ValidationError('Vote is already exists');
+    if (!election) {
+      throw new NotFoundError('Election is not found');
+    }
+
+    const hasVoted = election.candidates.some(candidate =>
+      candidate.votes?.some(vote => vote.nim === user.nim)
+    );
+
+    if (hasVoted) {
+      throw new ValidationError('User has already voted in this election');
     }
 
     const data: IVoteCreateRequest = voteSchema.parse({
-      nim,
+      nim: user.nim,
       candidateNim,
     } as IVoteCreateRequest);
 
     const vote = {
       _id: new mongoose.Types.ObjectId(),
       nim: data.nim,
-      candidateNim: data.candidateNim
     };
 
-    await Election.updateOne(
-      { _id: electionId },
-      { $push: { votes: vote } }
+    const result = await Election.updateOne(
+      {
+        _id: electionId,
+        'candidates.nim': candidateNim,
+        'candidates.votes.nim': { $ne: user.nim }
+      },
+      {
+        $addToSet: { 'candidates.$[candidate].votes': vote }
+      },
+      {
+        arrayFilters: [{ 'candidate.nim': candidateNim }]
+      }
     );
+
+    if (result.modifiedCount === 0) {
+      throw new NotFoundError('Candidate NIM is not found');
+    }
 
     return res.status(201).json({ message: 'Vote created successfully', data: vote });
 
@@ -195,6 +212,9 @@ export const vote = async (req: AuthenticatedRequest, res: Response) => {
     }
     if (err instanceof ValidationError) {
       return res.status(400).json(err.getMessage());
+    }
+    if (err instanceof NotFoundError) {
+      return res.status(404).json(err.getMessage());
     }
     return res.status(500).json({ message: 'Unhandled error: ', error: err });
   }

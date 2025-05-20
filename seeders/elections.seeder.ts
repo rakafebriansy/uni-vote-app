@@ -31,6 +31,7 @@ async function seedElections(count: number = 10) {
           expiresAt: faker.date.soon({ days: 30 }),
         })
       );
+      console.log('new election created successfully.');
     }
 
     await Election.insertMany(elections);

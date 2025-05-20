@@ -1,11 +1,18 @@
 import mongoose, { Document, Schema } from 'mongoose';
-import { Candidate } from '../types';
+import { Candidate, Vote } from '../types';
 
 export interface IElectionDoc extends Document {
     title: string;
     candidates: Candidate[];
     expiresAt: Date;
 }
+
+const VoteSchema = new Schema({
+    nim: {
+        type: String,
+        required: true,
+    },
+}, { _id: true, timestamps: true });
 
 const CandidateSchema = new Schema({
     name: {
@@ -16,6 +23,7 @@ const CandidateSchema = new Schema({
         type: String,
         required: true,
     },
+    votes: { type: [VoteSchema], default: [] }
 }, { _id: false });
 
 const ElectionSchema = new Schema({

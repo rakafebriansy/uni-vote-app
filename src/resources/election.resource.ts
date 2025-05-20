@@ -1,5 +1,5 @@
 import { IElectionDoc } from "../models/election.model";
-import { Candidate } from "../types";
+import { Candidate, Vote } from "../types";
 
 export class IElectionResource {
     id: string;
@@ -7,7 +7,7 @@ export class IElectionResource {
     candidates: Candidate[];
     expiresAt: Date;
 
-    constructor(id: string, title: string, candidates: Candidate[], expiresAt: Date) {
+    constructor(id: string, title: string, candidates: Candidate[], expiresAt: Date, votes?: Vote[]) {
         this.id = id;
         this.title = title;
         this.candidates = candidates;

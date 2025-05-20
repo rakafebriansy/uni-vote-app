@@ -1,4 +1,4 @@
-import { ValidationErrorEnum } from "../enums/validation.enum";
+import { ValidationErrorEnum } from "../constants";
 
 const validationErrorMessages: Record<ValidationErrorEnum, string> = {
     [ValidationErrorEnum.MINCHAR]: '{field} must be at least {value} characters',
